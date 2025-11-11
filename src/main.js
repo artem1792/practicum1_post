@@ -82,6 +82,12 @@ function renderPostList(userId = null) {
           <h2 class="post-title">${post.title}</h2>
           <p class="post-body">${post.body}</p>
           <button class="details-btn" data-post-id="${post.id}">Подробнее</button>
+          <div class='like'>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="btn-like bi bi-heart-fill" viewBox="0 0 16 16">
+              <path data-idpost="${post.id}" class="like-path" fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+            </svg>
+            <span>${post.likes || 0}</span>
+          </div>
         </div>
       `).join('');
     })
@@ -139,3 +145,23 @@ async function showModal(postId) {
 }
 
 init();
+
+/* лайки */
+
+document.querySelector(".main-content").addEventListener('click', (e)=>{
+  if (e.target.classList.contains("like-path")) {
+    let idPost = e.target.dataset.idpost;
+    let number = +e.target.closest('.like').querySelector('span').innerText + 1;
+    fetch("http://localhost:3000/posts/" + idPost,
+    {
+      headers: {     
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'    
+      },
+      method: "PATCH",
+      body: JSON.stringify({
+        "likes": number
+      })
+    }).catch((error)=>console.log(error));
+  }
+});
