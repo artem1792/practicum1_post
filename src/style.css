@@ -54,10 +54,12 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   text-decoration: none;
   transition: background-color 0.2s;
+  background-color: #84cc16;
+  color: white;
 }
 
 .all-authors-btn:hover {
-  background-color: #84cc16;
+  background-color: #65a30d;
 }
 
 .authors-space {
@@ -82,6 +84,30 @@ body {
 
 .author-link:hover {
   background-color: #ecfccb;
+}
+
+/* НОВАЯ КНОПКА: + Новый пост */
+.create-post-btn-container {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+#createCreateModal,
+.create-post-btn {
+  background-color: #d9f99d;
+  color: #1f2937;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.create-post-btn:hover {
+  background-color: #a3e635;
 }
 
 /* посты */
@@ -112,11 +138,17 @@ body {
   color: #4d7c0f;
 }
 
+.post-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .details-btn {
   background-color: #d9f99d;
   color: #1f2937;
   padding: 0.5rem 1rem;
-  margin-top: 0.75rem;
   border-radius: 0.5rem;
   font-weight: 500;
   border: none;
@@ -128,19 +160,55 @@ body {
   background-color: #a3e635;
 }
 
+/* НОВАЯ КНОПКА: Удалить */
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
 .like {
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .btn-like {
   cursor: pointer;
-  color: #d9f99d;
+  width: 28px;
+  height: 28px;
+  fill: #3f6212;
+  transition: transform 0.2s;
 }
 
 .btn-like:hover {
-  color: #a3e635;
+  transform: scale(1.2);
+}
+
+.like span {
+  font-weight: bold;
+  color: #3f6212;
+  font-size: 1.1rem;
+}
+
+.like-path {
+  fill: #d9f99d;
 }
 
 /* подвал */
@@ -153,7 +221,7 @@ body {
   margin-right: 16rem;
 }
 
-/* модальное */
+/* модальное окно (общее) */
 
 .modal-overlay {
   position: fixed;
@@ -161,11 +229,12 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
@@ -173,11 +242,67 @@ body {
   padding: 2rem;
   border-radius: 1rem;
   max-width: 42rem;
-  width: 100%;
-  max-height: 80vh;
+  width: 90%;
+  max-height: 85vh;
   overflow-y: auto;
+  border: 2px solid #d9f99d;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* Стили для формы создания поста в модалке */
+.create-modal input,
+.create-modal textarea,
+.create-modal select {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
   border: 1px solid #d9f99d;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #f7fee7;
+  transition: border-color 0.2s;
+}
+
+.create-modal input:focus,
+.create-modal textarea:focus,
+.create-modal select:focus {
+  outline: none;
+  border-color: #84cc16;
+  box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.2);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.modal-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-buttons button[type="submit"] {
+  background-color: #d9f99d;
+  color: white;
+}
+
+.modal-buttons button[type="submit"]:hover {
+  background-color: #d9f99d;
+}
+
+.modal-buttons .close-modal {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.modal-buttons .close-modal:hover {
+  background-color: #d1d5db;
 }
 
 .close-modal {
@@ -190,6 +315,7 @@ body {
   cursor: pointer;
   transition: background-color 0.2s;
   width: 100%;
+  margin-top: 1.5rem;
 }
 
 .close-modal:hover {
@@ -215,7 +341,7 @@ body {
 .comments-title {
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin: 1.5rem 0 1rem;
   color: #3f6212;
 }
 
@@ -227,7 +353,7 @@ body {
 }
 
 .comment-card {
-  background-color: white;
+  background-color: #f7fee7;
   padding: 1rem;
   border-radius: 0.75rem;
   border: 1px solid #d9f99d;
@@ -247,4 +373,10 @@ body {
 .comment-body {
   margin-top: 0.5rem;
   color: #4d7c0f;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
 }

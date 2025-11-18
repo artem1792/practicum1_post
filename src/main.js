@@ -1,8 +1,15 @@
 const app = document.getElementById('app');
+const API_BASE = 'http://localhost:3000';
 
 function init() {
   app.innerHTML = `
     <header id="header" class="header"></header>
+
+    <!-- Кнопка открытия формы создания поста -->
+    <div class="create-post-btn-container">
+      <button id="openCreateModal" class="create-post-btn">Новый пост</button>
+    </div>
+
     <main id="post-list" class="main-content"></main>
     <footer id="footer" class="footer"></footer>
   `;
@@ -11,157 +18,219 @@ function init() {
   renderFooter();
   renderPostList();
 
-  // клики
-  document.addEventListener('click', (e) => {
+  // открытие модалки создания поста
+  document.getElementById('openCreateModal').addEventListener('click', openCreatePostModal);
+
+  // обработкакликов
+  document.addEventListener('click', e => {
     if (e.target.classList.contains('author-link')) {
       const userId = e.target.dataset.userId;
       renderPostList(userId);
     }
-  });
-
-  document.addEventListener('click', (e) => {
     if (e.target.classList.contains('details-btn')) {
-      const postId = e.target.dataset.postId;
-      showModal(postId);
+      showModal(e.target.dataset.postId);
+    }
+    if (e.target.classList.contains('delete-btn')) {
+      if (confirm('Удалить этот пост?')) {
+        deletePost(e.target.dataset.postId);
+      }
     }
   });
 }
 
-/* шапка */
-
-function renderHeader() {
-  const header = document.getElementById('header');
-  fetch('/db.json')
-    .then((response) => response.json())
-    .then((data) => {
-      const authors = data.users;
-      header.innerHTML = `
-        <nav class="header-nav">
-          <h1 class="header-title">Авторы</h1>
-          <div class="nav-space">
-            <a href="#" class="all-authors-btn author-link" data-user-id="all">Все</a>
-            <div class="authors-space">
-              ${authors.map(author => `
-                <a href="#" class="author-link" data-user-id="${author.id}">${author.name}</a>
-              `).join('')}
-            </div>
-          </div>
-        </nav>
-      `;
-    })
-}
-
-/* подвал */
-
-function renderFooter() {
-  const footer = document.getElementById('footer');
-  footer.innerHTML = `
-    <p>Бобровский Артём &copy; ${new Date().getFullYear()}</p>
-  `;
-}
-
-/* рендер постов */
-
-function renderPostList(userId = null) {
-  const postList = document.getElementById('post-list');
-
-  fetch('/db.json')
-    .then((response) => {
-      if (!response.ok) throw new Error(`${response.status} — ${response.statusText}`);
-      return response.json();
-    })
-    .then((data) => {
-      let posts = data.posts;
-      
-      if (userId && userId !== 'all') {
-        posts = posts.filter(post => post.userId == userId);
-      }
-
-      postList.innerHTML = posts.map(post => `
-        <div class="post-card">
-          <h2 class="post-title">${post.title}</h2>
-          <p class="post-body">${post.body}</p>
-          <button class="details-btn" data-post-id="${post.id}">Подробнее</button>
-          <div class='like'>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="btn-like bi bi-heart-fill" viewBox="0 0 16 16">
-              <path data-idpost="${post.id}" class="like-path" fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
-            </svg>
-            <span>${post.likes || 0}</span>
-          </div>
-        </div>
-      `).join('');
-    })
-    .catch((error) => {
-      postList.innerHTML = `<p class="error-message">Ошибка: ${error.message}</p>`;
-    });
-}
-
-/* модальное */
-
-async function showModal(postId) {
+// модалка создания поста
+async function openCreatePostModal() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `
-    <div class="modal-content">
-      <button class="close-modal">Закрыть</button>
+    <div class="modal-content create-modal">
+      <form id="createPostForm">
+        <input type="text" id="postTitle" placeholder="Название поста" required>
+        <textarea id="postBody" placeholder="Текст поста" rows="5" required></textarea>
+        <select id="postAuthor" required>
+          <option value="">Выберите автора</option>
+        </select>
+        <div class="modal-buttons">
+          <button type="submit">Опубликовать</button>
+          <button type="button" class="close-modal">Отмена</button>
+        </div>
+        <p id="formError" class="error-message"></p>
+      </form>
     </div>
   `;
   document.body.appendChild(modal);
 
+  // загрузка авторов в селектыч
   try {
-    const response = await fetch('/db.json');
-    const data = await response.json();
-
-    const post = data.posts.find(p => p.id == postId);
-    const comments = data.comments ? data.comments.filter(comment => comment.postId == postId) : [];
-
-    modal.querySelector('.modal-content').innerHTML = `
-      <h2 class="modal-title">${post.title}</h2>
-      <p class="modal-text">${post.body}</p>
-      <h3 class="comments-title">Комментарии:</h3>
-      <div class="comments-space">
-        ${comments.map(comment => `
-          <div class="comment-card">
-            <p class="comment-author">${comment.name} <span class="comment-email">(${comment.email})</span></p>
-            <p class="comment-body">${comment.body}</p>
-          </div>
-        `).join('')}
-      </div>
-      <button class="close-modal">Закрыть</button>
-    `;
-  } catch (error) {
-    modal.querySelector('.modal-content').innerHTML = `
-      <button class="close-modal">Закрыть</button>
-    `;
+    const res = await fetch(`${API_BASE}/users`);
+    const users = await res.json();
+    const select = modal.querySelector('#postAuthor');
+    select.innerHTML = '<option value="">Выберите автора</option>' +
+      users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+  } catch {
+    modal.querySelector('#formError').textContent = 'Не удалось загрузить авторов';
   }
 
-  /* закрывашка модального */
-  
-  modal.addEventListener('click', (e) => {
+  // обработка отправки формы
+  modal.querySelector('#createPostForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const title = modal.querySelector('#postTitle').value.trim();
+    const body = modal.querySelector('#postBody').value.trim();
+    const userId = modal.querySelector('#postAuthor').value;
+    const error = modal.querySelector('#formError');
+
+    if (!title || !body || !userId) {
+      error.textContent = 'Заполните все поля!';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, body, userId: +userId, numberOfLike: 0 })
+      });
+
+      if (!res.ok) throw new Error('error');
+      modal.remove();
+      renderPostList();
+      alert('Пост успешно создан');
+    } catch (err) {
+      error.textContent = err.message;
+    }
+  });
+
+  modal.addEventListener('click', e => {
     if (e.target.classList.contains('close-modal') || e.target === modal) {
       modal.remove();
     }
   });
 }
 
-init();
+// удаление поста
+function deletePost(postId) {
+  fetch(`${API_BASE}/posts/${postId}`, { method: 'DELETE' })
+    .then(r => { if (r.ok) renderPostList(); })
+    .catch(() => alert('error'));
+}
 
-/* лайки */
+// шапка
+function renderHeader() {
+  const header = document.getElementById('header');
+  fetch(`${API_BASE}/users`)
+    .then(r => r.json())
+    .then(users => {
+      header.innerHTML = `
+        <nav class="header-nav">
+          <h1 class="header-title">Авторы</h1>
+          <div class="nav-space">
+            <a href="#" class="all-authors-btn author-link" data-user-id="all">Все</a>
+            <div class="authors-space">
+              ${users.map(u => `<a href="#" class="author-link" data-user-id="${u.id}">${u.name}</a>`).join('')}
+            </div>
+          </div>
+        </nav>
+      `;
+    });
+}
 
-document.querySelector(".main-content").addEventListener('click', (e)=>{
-  if (e.target.classList.contains("like-path")) {
-    let idPost = e.target.dataset.idpost;
-    let number = +e.target.closest('.like').querySelector('span').innerText + 1;
-    fetch("http://localhost:3000/posts/" + idPost,
-    {
-      headers: {     
+// подвал
+function renderFooter() {
+  document.getElementById('footer').innerHTML = `<p>Бобровский Артём © ${new Date().getFullYear()}</p>`;
+}
+
+// список постов
+function renderPostList(userId = null) {
+  const container = document.getElementById('post-list');
+  let url = `${API_BASE}/posts`;
+  if (userId && userId !== 'all') url += `?userId=${userId}`;
+
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error('Ошибка'); return r.json(); })
+    .then(posts => {
+      container.innerHTML = posts.map(p => `
+        <div class="post-card">
+          <h2 class="post-title">${p.title}</h2>
+          <p class="post-body">${p.body}</p>
+          <div class="post-actions">
+            <button class="details-btn" data-post-id="${p.id}">Подробнее</button>
+            <button class="delete-btn" data-post-id="${p.id}">Удалить</button>
+          </div>
+          <div class="like">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path class="like-path" data-idpost="${p.id}" fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+            </svg>
+            <span>${p.numberOfLike || 0}</span>
+          </div>
+        </div>
+      `).join('');
+    })
+    .catch(() => container.innerHTML = '<p class="error-message">Ошибка загрузки постов</p>');
+}
+
+// модалка подробнее
+async function showModal(postId) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="modal-content"><button class="close-modal">Закрыть</button></div>`;
+  document.body.appendChild(modal);
+
+  try {
+    const [postRes, commRes] = await Promise.all([
+      fetch(`${API_BASE}/posts/${postId}`),
+      fetch(`${API_BASE}/comments?postId=${postId}`)
+    ]);
+    const post = await postRes.json();
+    const comments = await commRes.json();
+
+    modal.querySelector('.modal-content').innerHTML = `
+      <h2 class="modal-title">${post.title}</h2>
+      <p class="modal-text">${post.body}</p>
+      <h3 class="comments-title">Комментарии:</h3>
+      <div class="comments-space">
+        ${comments.length ? comments.map(c => `
+          <div class="comment-card">
+            <p class="comment-author">${c.name} <span class="comment-email">(${c.email})</span></p>
+            <p class="comment-body">${c.body}</p>
+          </div>
+        `).join('') : '<p>Комментариев нет</p>'}
+      </div>
+      <button class="close-modal">Закрыть</button>
+    `;
+  } catch {
+    modal.querySelector('.modal-content').innerHTML += `<p class="error-message">Ошибка загрузки</p><button class="close-modal">Закрыть</button>`;
+  }
+
+  modal.addEventListener('click', e => {
+    if (e.target.classList.contains('close-modal') || e.target === modal) modal.remove();
+  });
+}
+
+// лайки
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('like-path')) {
+    let id = e.target.getAttribute('data-idpost');
+    let span = e.target.closest('.like').querySelector('span');
+    let likes = Number(span.innerText) + 1;
+    
+    fetch('http://localhost:3000/posts/' + id, {
+      headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'    
+        'Content-Type': 'application/json'
       },
-      method: "PATCH",
+      method: 'PATCH',
       body: JSON.stringify({
-        "likes": number
+        numberOfLike: likes
       })
-    }).catch((error)=>console.log(error));
+    })
+    .then(() => {
+      span.innerText = likes;
+    })
+    .catch(() => {
+      alert('error');
+    });
+    
   }
 });
+
+init();
