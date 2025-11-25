@@ -7,7 +7,13 @@
   <link rel="stylesheet" href="src/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
+<body>
+  <div>
+    <input type="radio" id="light-theme" name="theme">
+    <label for="light-theme">светлая тема</label>
+    <input type="radio" id="dark-theme" name="theme">
+    <label for="dark-theme">тёмная тема</label>
+  </div>
   <div id="app"></div>
   <script type="module" src="/src/main.js"></script>
 </body>

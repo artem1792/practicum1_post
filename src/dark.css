@@ -1,0 +1,244 @@
+body {
+    background: #464646;
+    color: #f3f4f6;
+}
+
+.header {
+  background: #303030;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 16rem;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.all-authors-btn {
+  display: block;
+  width: 100%;
+  color: #1f2937;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: background-color 0.2s;
+  background-color: #ffffff;
+  color: #303030;
+}
+
+.all-authors-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.author-link {
+  display: block;
+  width: 100%;
+  background-color: white;
+  color: #303030;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid #303030;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.author-link:hover {
+  background-color: #e0e0e0;
+}
+
+#createCreateModal,
+.create-post-btn {
+  background-color: #303030;
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.create-post-btn:hover {
+  background-color: #2b2b2b;
+}
+
+.post-card {
+  background-color: white;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #464646;
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+
+.post-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #303030;
+}
+
+.post-body {
+  margin-top: 0.75rem;
+  color: #333333;
+}
+
+.details-btn {
+  background-color: #303030;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.details-btn:hover {
+  background-color: #464646;
+}
+
+.btn-like {
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  fill: #303030;
+  transition: transform 0.2s;
+}
+
+.like span {
+  font-weight: bold;
+  color: #303030;
+  font-size: 1.1rem;
+}
+
+.like-path {
+  fill: #464646;
+}
+
+.footer {
+  background-color: #303030;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  margin-right: 16rem;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 42rem;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #303030;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+.create-modal input,
+.create-modal textarea,
+.create-modal select {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+  border: 1px solid #303030;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #303030;
+  transition: border-color 0.2s;
+}
+
+.create-modal input:focus,
+.create-modal textarea:focus,
+.create-modal select:focus {
+  outline: none;
+  border-color: #303030;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.modal-buttons button[type="submit"] {
+  background-color: #303030;
+  color: white;
+}
+
+.modal-buttons button[type="submit"]:hover {
+  background-color: #464646;
+}
+
+.close-modal {
+  background-color: #303030;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.close-modal:hover {
+  background-color: #464646;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #303030;
+  border-bottom: 1px solid #303030;
+  padding-bottom: 1rem;
+}
+
+.modal-text {
+  margin-bottom: 1.5rem;
+  color: #303030;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.comments-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+  color: #303030;
+}
+
+.comment-card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #303030;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #464646;
+}
+
+.comment-email {
+  color: #303030;
+  font-size: 0.875rem;
+}
+
+.comment-body {
+  margin-top: 0.5rem;
+  color: #242424;
+}
