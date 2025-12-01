@@ -242,3 +242,16 @@ body {
   margin-top: 0.5rem;
   color: #242424;
 }
+
+.view-switch button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  background-color: #303030;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.view-switch button:hover {
+  background-color: #2b2b2b;
+}

@@ -5,9 +5,13 @@ function init() {
   app.innerHTML = `
     <header id="header" class="header"></header>
 
-    <!-- Кнопка открытия формы создания поста -->
     <div class="create-post-btn-container">
       <button id="openCreateModal" class="create-post-btn">Новый пост</button>
+
+      <div class="view-switch">
+        <button id="viewList">Список</button>
+        <button id="viewGrid">Плитка</button>
+      </div>
     </div>
   
     <main id="post-list" class="main-content"></main>
@@ -21,7 +25,7 @@ function init() {
   // открытие модалки создания поста
   document.getElementById('openCreateModal').addEventListener('click', openCreatePostModal);
 
-  // обработкакликов
+  // обработка кликов
   document.addEventListener('click', e => {
     if (e.target.classList.contains('author-link')) {
       const userId = e.target.dataset.userId;
@@ -35,6 +39,22 @@ function init() {
         deletePost(e.target.dataset.postId);
       }
     }
+  });
+
+  // хранение режима вывода
+  let savedView = localStorage.getItem("postView") || "list";
+  document.body.setAttribute("data-view", savedView);
+
+  document.getElementById("viewList").addEventListener("click", () => {
+    localStorage.setItem("postView", "list");
+    document.body.setAttribute("data-view", "list");
+    renderPostList();
+  });
+
+  document.getElementById("viewGrid").addEventListener("click", () => {
+    localStorage.setItem("postView", "grid");
+    document.body.setAttribute("data-view", "grid");
+    renderPostList();
   });
 }
 
@@ -60,7 +80,6 @@ async function openCreatePostModal() {
   `;
   document.body.appendChild(modal);
 
-  // загрузка авторов в селектыч
   try {
     const res = await fetch(`${API_BASE}/users`);
     const users = await res.json();
@@ -71,7 +90,6 @@ async function openCreatePostModal() {
     modal.querySelector('#formError').textContent = 'Не удалось загрузить авторов';
   }
 
-  // обработка отправки формы
   modal.querySelector('#createPostForm').addEventListener('submit', async e => {
     e.preventDefault();
     const title = modal.querySelector('#postTitle').value.trim();
@@ -142,6 +160,12 @@ function renderFooter() {
 // список постов
 function renderPostList(userId = null) {
   const container = document.getElementById('post-list');
+
+  // вид постов
+  const viewMode = localStorage.getItem("postView") || "list";
+  container.classList.remove("view-list", "view-grid");
+  container.classList.add(`view-${viewMode}`);
+
   let url = `${API_BASE}/posts`;
   if (userId && userId !== 'all') url += `?userId=${userId}`;
 
@@ -235,9 +259,7 @@ document.addEventListener('click', function(e) {
 
 init();
 
-// localstorage
-
-// 2 - theme
+// localstorage theme
 const btnLight = document.getElementById("light-theme");
 const btnDark = document.getElementById("dark-theme");
 

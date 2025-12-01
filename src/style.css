@@ -249,7 +249,7 @@ body {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
 }
 
-/* Стили для формы создания поста в модалке */
+/* форма создания поста в модалке */
 .create-modal input,
 .create-modal textarea,
 .create-modal select {
@@ -379,4 +379,38 @@ body {
   color: #dc2626;
   font-size: 0.9rem;
   margin-top: 0.5rem;
+}
+
+/* вид постов */
+.view-switch {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.view-switch button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  background-color: #d9f99d;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.view-switch button:hover {
+  background-color: #a3e635;
+}
+
+.view-list .post-card {
+  width: 100%;
+}
+
+.view-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.view-grid .post-card {
+  margin: 0 !important;
+  height: auto;
 }
