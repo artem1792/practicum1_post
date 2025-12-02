@@ -39,6 +39,11 @@ function init() {
         deletePost(e.target.dataset.postId);
       }
     }
+    if (e.target.classList.contains("favorite-btn")) {
+      const id = Number(e.target.dataset.postId);
+      addFavoritePost(id);
+      renderPostList();
+    }
   });
 
   // хранение режима вывода
@@ -173,13 +178,17 @@ function renderPostList(userId = null) {
     .then(r => { if (!r.ok) throw new Error('Ошибка'); return r.json(); })
     .then(posts => {
       container.innerHTML = posts.map(p => `
-        <div class="post-card">
+        <div class="post-card ${isFavorite(p.id) ? 'favorite' : ''}">
           <h2 class="post-title">${p.title}</h2>
           <p class="post-body">${p.body}</p>
+
           <div class="post-actions">
             <button class="details-btn" data-post-id="${p.id}">Подробнее</button>
             <button class="delete-btn" data-post-id="${p.id}">Удалить</button>
           </div>
+
+          <button class="favorite-btn" data-post-id="${p.id}">${isFavorite(p.id) ? "★" : "☆"}</button>
+
           <div class="like">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
               <path class="like-path" data-idpost="${p.id}" fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
@@ -231,12 +240,12 @@ async function showModal(postId) {
 }
 
 // лайки
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   if (e.target.classList.contains('like-path')) {
     let id = e.target.getAttribute('data-idpost');
     let span = e.target.closest('.like').querySelector('span');
     let likes = Number(span.innerText) + 1;
-    
+
     fetch('http://localhost:3000/posts/' + id, {
       headers: {
         'Accept': 'application/json',
@@ -247,19 +256,19 @@ document.addEventListener('click', function(e) {
         numberOfLike: likes
       })
     })
-    .then(() => {
-      span.innerText = likes;
-    })
-    .catch(() => {
-      alert('error');
-    });
-    
+      .then(() => {
+        span.innerText = likes;
+      })
+      .catch(() => {
+        alert('error');
+      });
+
   }
 });
 
 init();
 
-// localstorage theme
+// переключение темы
 const btnLight = document.getElementById("light-theme");
 const btnDark = document.getElementById("dark-theme");
 
@@ -291,3 +300,40 @@ btnDark.addEventListener("change", () => {
   link.id = "dark-style"
   document.querySelector("head").append(link);
 })
+
+// счетчик перезагрузок
+let count;
+const STORAGE_KEY = 'pageReloadCount';
+let storedValue = localStorage.getItem(STORAGE_KEY) || 0;
+
+storedValue = parseInt(storedValue)
+
+count = storedValue + 1;
+localStorage.setItem(STORAGE_KEY, String(count));
+
+const counterElement = document.getElementById('reload-count');
+if (counterElement) {
+  counterElement.textContent = count;
+}
+
+// избранные посты
+const FAV_STORAGE_KEY = 'favoritePosts';
+
+function getFavoritePosts() {
+  const stored = localStorage.getItem(FAV_STORAGE_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+function addFavoritePost(postId) {
+  const favs = getFavoritePosts();
+  const index = favs.indexOf(postId);
+  if (index === -1) {
+    favs.push(postId);
+  }
+  localStorage.setItem(FAV_STORAGE_KEY, JSON.stringify(favs));
+}
+
+function isFavorite(postId) {
+  const favs = getFavoritePosts();
+  return favs.includes(parseInt(postId));
+}

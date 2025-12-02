@@ -394,6 +394,7 @@ body {
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .view-switch button:hover {
@@ -413,4 +414,28 @@ body {
 .view-grid .post-card {
   margin: 0 !important;
   height: auto;
+}
+
+/* избранное */
+
+/* кнопка избранного */
+.favorite-btn {
+  background-color: #d9f99d;
+  color: #65a30d;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.favorite-btn:hover {
+  background-color: #a3e635;
+}
+
+.post-card.favorite {
+  border: 1px solid #d9f99d;
+  background-color: #f7fee7;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
