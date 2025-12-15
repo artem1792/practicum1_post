@@ -44,6 +44,9 @@ function init() {
       addFavoritePost(id);
       renderPostList();
     }
+    if (e.target.classList.contains('edit-btn')) {
+      openEditPostModal(e.target.dataset.postId);
+    }
   });
 
   // хранение режима вывода
@@ -184,6 +187,7 @@ function renderPostList(userId = null) {
 
           <div class="post-actions">
             <button class="details-btn" data-post-id="${p.id}">Подробнее</button>
+            <button class="edit-btn" data-post-id="${p.id}">Редактировать</button>
             <button class="delete-btn" data-post-id="${p.id}">Удалить</button>
           </div>
 
@@ -203,6 +207,9 @@ function renderPostList(userId = null) {
 
 // модалка подробнее
 async function showModal(postId) {
+  const existingModal = document.querySelector('.modal-overlay');
+  if (existingModal) existingModal.remove();
+
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `<div class="modal-content"><button class="close-modal">Закрыть</button></div>`;
@@ -221,13 +228,20 @@ async function showModal(postId) {
       <p class="modal-text">${post.body}</p>
       <h3 class="comments-title">Комментарии:</h3>
       <div class="comments-space">
-        ${comments.length ? comments.map(c => `
+        ${comments.map(c => `
           <div class="comment-card">
-            <p class="comment-author">${c.name} <span class="comment-email">(${c.email})</span></p>
+            <p class="comment-author">${c.name}<button class="delete-comment-btn" data-comment-id="${c.id}" data-post-id="${post.id}">⠀✕</button></p>
+            <span class="comment-email">(${c.email})</span>
             <p class="comment-body">${c.body}</p>
           </div>
-        `).join('') : '<p>Комментариев нет</p>'}
+        `).join('')}
       </div>
+      <form id="commentForm" data-post-id="${post.id}" class="comment-form">
+      <input type="text" id="commentName" placeholder="Имя" required>
+      <input type="email" id="commentEmail" placeholder="Email" required>
+      <textarea id="commentBody" placeholder="Комментарий" required></textarea>
+      <button type="submit">Добавить комментарий</button>
+      </form>
       <button class="close-modal">Закрыть</button>
     `;
   } catch {
@@ -337,3 +351,84 @@ function isFavorite(postId) {
   const favs = getFavoritePosts();
   return favs.includes(parseInt(postId));
 }
+
+// добавление комментов
+document.addEventListener('submit', async e => {
+  if (e.target.id === 'commentForm') {
+    e.preventDefault();
+
+    const postId = e.target.dataset.postId;
+    const name = e.target.querySelector('#commentName').value.trim();
+    const email = e.target.querySelector('#commentEmail').value.trim();
+    const body = e.target.querySelector('#commentBody').value.trim();
+
+    if (!name || !email || !body) return;
+
+    await fetch(`${API_BASE}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, name, email, body })
+    });
+
+    showModal(postId);
+  }
+});
+
+// редактирование постов
+async function openEditPostModal(postId) {
+  const res = await fetch(`${API_BASE}/posts/${postId}`);
+  const post = await res.json();
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content create-modal">
+      <h2 class="modal-title">Редактировать пост</h2>
+      <input id="editTitle" value="${post.title}">
+      <textarea id="editBody">${post.body}</textarea>
+
+      <div class="modal-buttons">
+        <button id="saveEdit">Сохранить</button>
+        <button class="close-modal">Отмена</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('#saveEdit').onclick = async () => {
+    await fetch(`${API_BASE}/posts/${postId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: editTitle.value,
+        body: editBody.value
+      })
+    });
+
+    modal.remove();
+    renderPostList();
+  };
+
+  modal.onclick = e => {
+    if (e.target.classList.contains('close-modal') || e.target === modal) {
+      modal.remove();
+    }
+  };
+}
+
+// удаление комментов
+document.addEventListener('click', async e => {
+  if (e.target.classList.contains('delete-comment-btn')) {
+    const commentId = e.target.dataset.commentId;
+    const postId = e.target.dataset.postId;
+
+    if (!confirm('Удалить комментарий?')) return;
+
+    await fetch(`${API_BASE}/comments/${commentId}`, {
+      method: 'DELETE'
+    });
+
+    showModal(postId);
+  }
+});

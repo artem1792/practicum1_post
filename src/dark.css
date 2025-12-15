@@ -255,3 +255,71 @@ body {
 .view-switch button:hover {
   background-color: #2b2b2b;
 }
+
+#favorites-link {
+  background-color: #ffffff;
+  color: #303030;
+}
+
+#favorites-link:hover {
+  background-color: #e0e0e0;
+}
+
+.edit-btn {
+  background-color: #303030;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #464646;
+}
+
+.comment-form {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #303030;
+}
+
+.comment-form input,
+.comment-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #303030;
+  font-size: 1rem;
+  background-color: #303030;
+  color: #ffffff;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+  outline: none;
+  border-color: #464646;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.comment-form button {
+  background-color: #303030;
+  color: #ffffff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.comment-form button:hover {
+  background-color: #464646;
+}
+
+button#saveEdit {
+  background: #303030;
+}
